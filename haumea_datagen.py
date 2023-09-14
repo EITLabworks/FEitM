@@ -109,7 +109,7 @@ el_pos = mesh_empty.el_pos
 
 # FOR LOOP
 s_idx = 0
-for bone_perm_var, cart_perm_var, r_car in tqdm(np.round(
+for bone_perm, cart_perm, r_car in tqdm(np.round(
     np.random.uniform(
         low=(
             bone_base_perm_val - bone_perm_variation,
@@ -126,10 +126,10 @@ for bone_perm_var, cart_perm_var, r_car in tqdm(np.round(
     3,
 )):
     anomaly_cartilage = PyEITAnomaly_Circle(
-        center=[0, 0], r=r_car, perm=cart_base_perm_val + cart_perm_var
+        center=[0, 0], r=r_car, perm=cart_perm
     )
     anomaly_bone = PyEITAnomaly_Circle(
-        center=[0, 0], r=r_bone, perm=bone_base_perm_val + bone_perm_var
+        center=[0, 0], r=r_bone, perm=bone_perm
     )
 
     mesh_empty = mesh.set_perm(
@@ -150,7 +150,7 @@ for bone_perm_var, cart_perm_var, r_car in tqdm(np.round(
 
     np.savez(
         save_path + "sample_{:06d}.npz".format(s_idx),
-        params=f"{bone_perm_var=}, {cart_perm_var=}, {r_car=}",
+        params=f"{bone_perm=}, {cart_perm=}, {r_car=}",
         mesh=mesh_obj,
         v_empty=v_empty,
         v_obj=v_obj,
