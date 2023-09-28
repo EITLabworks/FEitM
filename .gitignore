@@ -3,3 +3,11 @@ old_meshing_test.ipynb
 __pycache__
 data
 gen_train_data.ipynb
+ng.ini
+3d/*.stl
+3d/*.obj
+3d/*.FCStd
+3d/*.FCBak
+3d/*.gz
+3d/*.gmsh2
+3d/poisson_example.ipynb

@@ -4,6 +4,7 @@ import pyeit.mesh as mesh
 from pyeit.eit.fem import EITForward
 from pyeit.mesh import PyEITMesh
 from tqdm import tqdm
+
 ## from pyeit.mesh.shape import thorax
 from pyeit.mesh.wrapper import PyEITAnomaly_Circle
 from sciopy import plot_mesh
@@ -67,16 +68,12 @@ def move_el(
 
     for el_n, tar in zip(el_idx, target_x_y):
         x_tar, y_tar = tar
-        tar_idx = np.argsort(
-            np.abs((x_node - x_tar) ** 2 + (y_node - y_tar) ** 2)
-        )[0]
+        tar_idx = np.argsort(np.abs((x_node - x_tar) ** 2 + (y_node - y_tar) ** 2))[0]
         mesh.el_pos[el_n] = tar_idx
     return mesh
 
 
-def set_perm_circle(
-    mesh_obj: PyEITMesh, anomaly: PyEITAnomaly_Circle
-) -> PyEITMesh:
+def set_perm_circle(mesh_obj: PyEITMesh, anomaly: PyEITAnomaly_Circle) -> PyEITMesh:
     pts = mesh_obj.element
     tri = mesh_obj.node
     perm = mesh_obj.perm
@@ -109,35 +106,29 @@ el_pos = mesh_empty.el_pos
 
 # FOR LOOP
 s_idx = 0
-for bone_perm, cart_perm, r_car in tqdm(np.round(
-    np.random.uniform(
-        low=(
-            bone_base_perm_val - bone_perm_variation,
-            cart_base_perm_val - cart_perm_variation,
-            min_r_cart,
+for bone_perm, cart_perm, r_car in tqdm(
+    np.round(
+        np.random.uniform(
+            low=(
+                bone_base_perm_val - bone_perm_variation,
+                cart_base_perm_val - cart_perm_variation,
+                min_r_cart,
+            ),
+            high=(
+                bone_base_perm_val + bone_perm_variation,
+                cart_base_perm_val + cart_perm_variation,
+                max_r_cart,
+            ),
+            size=(num_samples, 3),
         ),
-        high=(
-            bone_base_perm_val + bone_perm_variation,
-            cart_base_perm_val + cart_perm_variation,
-            max_r_cart,
-        ),
-        size=(num_samples, 3),
-    ),
-    3,
-)):
-    anomaly_cartilage = PyEITAnomaly_Circle(
-        center=[0, 0], r=r_car, perm=cart_perm
+        3,
     )
-    anomaly_bone = PyEITAnomaly_Circle(
-        center=[0, 0], r=r_bone, perm=bone_perm
-    )
+):
+    anomaly_cartilage = PyEITAnomaly_Circle(center=[0, 0], r=r_car, perm=cart_perm)
+    anomaly_bone = PyEITAnomaly_Circle(center=[0, 0], r=r_bone, perm=bone_perm)
 
-    mesh_empty = mesh.set_perm(
-        mesh_empty, anomaly=anomaly_bone, background=1.0
-    )
-    mesh_obj = mesh.set_perm(
-        mesh_obj, anomaly=anomaly_cartilage, background=1.0
-    )
+    mesh_empty = mesh.set_perm(mesh_empty, anomaly=anomaly_bone, background=1.0)
+    mesh_obj = mesh.set_perm(mesh_obj, anomaly=anomaly_cartilage, background=1.0)
     mesh_obj = set_perm_circle(mesh_obj, anomaly=anomaly_bone)
 
     protocol_obj = protocol.create(
